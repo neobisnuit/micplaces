@@ -72,7 +72,6 @@ const countySelect = document.getElementById('county-select');
 const resultCountEl = document.getElementById('result-count');
 const clearFiltersBtn = document.getElementById('clear-filters');
 const emptyStateEl = document.getElementById('empty-state');
-const header = document.getElementById('site-header');
 const filterBar = document.getElementById('filter-bar');
 const backToTop = document.getElementById('back-to-top');
 
@@ -235,7 +234,6 @@ function highlightText(text, query) {
 let lastScroll = 0;
 function onScroll() {
   const y = window.scrollY;
-  header.classList.toggle('scrolled', y > 10);
   filterBar.classList.toggle('scrolled', y > 200);
   backToTop.classList.toggle('visible', y > 600);
   lastScroll = y;

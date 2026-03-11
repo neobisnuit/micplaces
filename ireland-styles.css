@@ -112,21 +112,24 @@ body {
   font-family: var(--font);
   font-size: 14px;
   font-weight: 600;
-  color: var(--white);
-  background: rgba(255,255,255,0.18);
-  border: 1.5px solid rgba(255,255,255,0.3);
-  padding: 10px 24px;
-  border-radius: 8px;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  background: rgba(255,255,255,0.92);
+  border: none;
+  padding: 12px 28px;
+  border-radius: 50px;
   text-decoration: none;
-  margin-bottom: 32px;
-  transition: background 0.2s var(--ease), border-color 0.2s, box-shadow 0.2s;
+  margin: 8px 0 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s var(--ease), transform 0.2s, box-shadow 0.2s;
 }
 .hero-pdf:hover {
-  background: rgba(255,255,255,0.28);
-  border-color: rgba(255,255,255,0.5);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  background: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
 }
-.hero-pdf svg { flex-shrink: 0; }
+.hero-pdf:active { transform: translateY(0); }
+.hero-pdf svg { flex-shrink: 0; color: var(--green); }
 
 .hero {
   background: linear-gradient(135deg, #2fbd76 0%, #27a86a 40%, #2E7D50 100%);

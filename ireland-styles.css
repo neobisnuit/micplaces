@@ -473,8 +473,6 @@ a.hero-pdf svg { flex-shrink: 0; color: #2fbd76 !important; }
   border-color: var(--border);
   transform: translateY(-2px);
 }
-.attraction-card[hidden] { display: none; }
-
 .card-img {
   position: relative;
   width: 100%;
@@ -540,11 +538,6 @@ a.hero-pdf svg { flex-shrink: 0; color: #2fbd76 !important; }
   transform: translateX(2px);
 }
 
-.highlight {
-  background: rgba(47,189,118,0.12);
-  border-radius: 2px;
-  padding: 0 1px;
-}
 
 .empty-state {
   text-align: center;

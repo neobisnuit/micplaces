@@ -168,7 +168,9 @@ function applyFilters() {
     if (searchQuery && show) {
       const matchName = card.dataset.name.includes(searchQuery);
       const matchDesc = card.dataset.desc.includes(searchQuery);
-      show = matchName || matchDesc;
+      const matchCounty = card.dataset.county.toLowerCase().includes(searchQuery);
+      const matchProvince = card.dataset.province.toLowerCase().includes(searchQuery);
+      show = matchName || matchDesc || matchCounty || matchProvince;
     }
 
     card.hidden = !show;

@@ -208,7 +208,7 @@ function applyFilters() {
     section.hidden = visibleCounties.length === 0;
   });
 
-  resultCountEl.innerHTML = `<strong>${visibleCount}</strong> ${visibleCount === 1 ? 'place' : 'places'} found`;
+  if (resultCountEl) resultCountEl.innerHTML = `<strong>${visibleCount}</strong> ${visibleCount === 1 ? 'place' : 'places'} found`;
 
   const hasFilters = activeProvince || activeCounty || searchQuery;
   clearFiltersBtn.classList.toggle('visible', hasFilters);

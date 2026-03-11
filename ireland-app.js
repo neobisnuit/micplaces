@@ -7,31 +7,41 @@ let searchQuery = '';
 let totalAttractions = 0;
 let totalCounties = 0;
 const provinceCounts = {};
+const countyNames = [];
 
 DATA.forEach(p => {
   let pCount = 0;
   totalCounties += p.counties.length;
   p.counties.forEach(c => {
     pCount += c.attractions.length;
+    countyNames.push(c.name.toLowerCase());
   });
   provinceCounts[p.province] = pCount;
   totalAttractions += pCount;
 });
 
+// ─── SAFE DOM HELPERS ───
+function $(id) { return document.getElementById(id); }
+
 // ─── RENDER HERO STATS ───
-document.getElementById('hero-stats').innerHTML = `
-  <div class="hero-stat"><span class="hero-stat-number">${DATA.length}</span><span class="hero-stat-label">Provinces</span></div>
-  <div class="hero-stat"><span class="hero-stat-number">${totalCounties}</span><span class="hero-stat-label">Counties</span></div>
-  <div class="hero-stat"><span class="hero-stat-number">${totalAttractions}</span><span class="hero-stat-label">Places</span></div>
-`;
+const heroStats = $('hero-stats');
+if (heroStats) {
+  heroStats.innerHTML = `
+    <div class="hero-stat"><span class="hero-stat-number">${DATA.length}</span><span class="hero-stat-label">Provinces</span></div>
+    <div class="hero-stat"><span class="hero-stat-number">${totalCounties}</span><span class="hero-stat-label">Counties</span></div>
+    <div class="hero-stat"><span class="hero-stat-number">${totalAttractions}</span><span class="hero-stat-label">Places</span></div>
+  `;
+}
 
 // ─── RENDER PROVINCE SELECT ───
-const provinceSelect = document.getElementById('province-select');
-provinceSelect.innerHTML = `<option value="">All provinces</option>` +
-  DATA.map(p => `<option value="${p.province}">${p.province} (${provinceCounts[p.province]})</option>`).join('');
+const provinceSelect = $('province-select');
+if (provinceSelect) {
+  provinceSelect.innerHTML = `<option value="">All provinces</option>` +
+    DATA.map(p => `<option value="${p.province}">${p.province} (${provinceCounts[p.province]})</option>`).join('');
+}
 
 // ─── RENDER MAIN CONTENT ───
-const mainEl = document.getElementById('main-content');
+const mainEl = $('main-content');
 let html = '';
 let imgIdx = 0;
 
@@ -48,7 +58,7 @@ DATA.forEach(p => {
     c.attractions.forEach(a => {
       imgIdx++;
       const imgSrc = IMG[imgIdx] || '';
-      html += `<article class="attraction-card" data-name="${a.name.toLowerCase()}" data-desc="${a.desc.toLowerCase()}" data-county="${c.name}" data-province="${p.province}">`;
+      html += `<article class="attraction-card" data-name="${a.name.toLowerCase()}" data-desc="${a.desc.toLowerCase()}" data-county="${c.name.toLowerCase()}" data-province="${p.province.toLowerCase()}">`;
       if (imgSrc) html += `<div class="card-img"><img src="${imgSrc}" alt="${a.name}" loading="lazy"></div>`;
       html += `<div class="card-body">`;
       html += `<h3 class="attraction-name">${a.name}</h3>`;
@@ -63,34 +73,38 @@ DATA.forEach(p => {
   html += `</div>`;
 });
 
-mainEl.innerHTML = html;
+if (mainEl) mainEl.innerHTML = html;
 
 // ─── ELEMENTS ───
-const searchInput = document.getElementById('search-input');
-const searchClear = document.getElementById('search-clear');
-const countySelect = document.getElementById('county-select');
-const resultCountEl = document.getElementById('result-count');
-const clearFiltersBtn = document.getElementById('clear-filters');
-const emptyStateEl = document.getElementById('empty-state');
-const filterBar = document.getElementById('filter-bar');
-const backToTop = document.getElementById('back-to-top');
+const searchInput = $('search-input');
+const searchClear = $('search-clear');
+const countySelect = $('county-select');
+const resultCountEl = $('result-count');
+const clearFiltersBtn = $('clear-filters');
+const emptyStateEl = $('empty-state');
+const filterBar = $('filter-bar');
+const backToTop = $('back-to-top');
 
 function updateSelectStyles() {
-  provinceSelect.classList.toggle('has-value', !!activeProvince);
-  countySelect.classList.toggle('has-value', !!activeCounty);
+  if (provinceSelect) provinceSelect.classList.toggle('has-value', !!activeProvince);
+  if (countySelect) countySelect.classList.toggle('has-value', !!activeCounty);
 }
 
 // ─── PROVINCE SELECT ───
-provinceSelect.addEventListener('change', () => {
-  activeProvince = provinceSelect.value || null;
-  activeCounty = null;
-  renderCountyOptions();
-  updateSelectStyles();
-  applyFilters();
-});
+if (provinceSelect) {
+  provinceSelect.addEventListener('change', () => {
+    activeProvince = provinceSelect.value || null;
+    activeCounty = null;
+    renderCountyOptions();
+    updateSelectStyles();
+    applyFilters();
+  });
+}
 
 // ─── COUNTY SELECT ───
 function renderCountyOptions() {
+  if (!countySelect) return;
+
   if (!activeProvince) {
     countySelect.innerHTML = `<option value="">All counties</option>` +
       DATA.flatMap(p => p.counties).map(c => `<option value="${c.name}">${c.name} (${c.attractions.length})</option>`).join('');
@@ -106,116 +120,140 @@ function renderCountyOptions() {
 
 renderCountyOptions();
 
-countySelect.addEventListener('change', () => {
-  activeCounty = countySelect.value || null;
-  updateSelectStyles();
-  applyFilters();
+if (countySelect) {
+  countySelect.addEventListener('change', () => {
+    activeCounty = countySelect.value || null;
+    updateSelectStyles();
+    applyFilters();
 
-  if (activeCounty) {
-    const countyId = activeCounty.toLowerCase().replace(/[^a-z]/g, '');
-    const el = document.getElementById('county-' + countyId);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  }
-});
+    if (activeCounty) {
+      const countyId = activeCounty.toLowerCase().replace(/[^a-z]/g, '');
+      const el = document.getElementById('county-' + countyId);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+}
 
 // ─── SEARCH ───
 let searchTimeout;
-searchInput.addEventListener('input', () => {
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => {
-    searchQuery = searchInput.value.trim().toLowerCase();
-    searchClear.classList.toggle('visible', searchQuery.length > 0);
-    applyFilters();
-  }, 150);
-});
+if (searchInput) {
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      searchQuery = searchInput.value.trim().toLowerCase();
+      if (searchClear) searchClear.classList.toggle('visible', searchQuery.length > 0);
+      applyFilters();
+    }, 150);
+  });
+}
 
-searchClear.addEventListener('click', () => {
-  searchInput.value = '';
-  searchQuery = '';
-  searchClear.classList.remove('visible');
-  applyFilters();
-  searchInput.focus();
-});
+if (searchClear) {
+  searchClear.addEventListener('click', () => {
+    if (searchInput) searchInput.value = '';
+    searchQuery = '';
+    searchClear.classList.remove('visible');
+    applyFilters();
+    if (searchInput) searchInput.focus();
+  });
+}
 
 // ─── CLEAR ALL ───
-clearFiltersBtn.addEventListener('click', () => {
-  activeProvince = null;
-  activeCounty = null;
-  searchInput.value = '';
-  searchQuery = '';
-  searchClear.classList.remove('visible');
+if (clearFiltersBtn) {
+  clearFiltersBtn.addEventListener('click', () => {
+    activeProvince = null;
+    activeCounty = null;
+    if (searchInput) searchInput.value = '';
+    searchQuery = '';
+    if (searchClear) searchClear.classList.remove('visible');
 
-  provinceSelect.value = '';
-  countySelect.value = '';
-  renderCountyOptions();
-  updateSelectStyles();
-  applyFilters();
-});
+    if (provinceSelect) provinceSelect.value = '';
+    if (countySelect) countySelect.value = '';
+    renderCountyOptions();
+    updateSelectStyles();
+    applyFilters();
+  });
+}
 
 // ─── APPLY FILTERS ───
 function applyFilters() {
-  const cards = mainEl.querySelectorAll('.attraction-card');
-  const provinceSections = mainEl.querySelectorAll('.province-section');
+  if (!mainEl) return;
+
   const countySections = mainEl.querySelectorAll('.county-section');
+  const provinceSections = mainEl.querySelectorAll('.province-section');
   let visibleCount = 0;
 
-  cards.forEach(card => {
-    let show = true;
-
-    if (activeProvince && card.dataset.province !== activeProvince) show = false;
-    if (activeCounty && card.dataset.county !== activeCounty) show = false;
-
-    if (searchQuery && show) {
-      const matchName = card.dataset.name.includes(searchQuery);
-      const matchDesc = card.dataset.desc.includes(searchQuery);
-      const matchCounty = card.dataset.county.toLowerCase().includes(searchQuery);
-      const matchProvince = card.dataset.province.toLowerCase().includes(searchQuery);
-      show = matchName || matchDesc || matchCounty || matchProvince;
-    }
-
-    card.style.display = show ? '' : 'none';
-    if (show) visibleCount++;
-  });
-
   countySections.forEach(section => {
-    const allCards = section.querySelectorAll('.attraction-card');
-    const visibleCards = Array.from(allCards).filter(c => c.style.display !== 'none');
-    section.style.display = visibleCards.length === 0 ? 'none' : '';
+    const sCounty = (section.dataset.county || '').toLowerCase();
+    const sProvince = (section.dataset.province || '').toLowerCase();
+    const cards = section.querySelectorAll('.attraction-card');
+
+    const countyMatchesSearch = searchQuery && sCounty.includes(searchQuery);
+    const provinceMatchesSearch = searchQuery && sProvince.includes(searchQuery);
+    const sectionMatchesSearch = countyMatchesSearch || provinceMatchesSearch;
+
+    let sectionVisible = 0;
+
+    cards.forEach(card => {
+      let show = true;
+
+      if (activeProvince && card.dataset.province.toLowerCase() !== activeProvince.toLowerCase()) show = false;
+      if (activeCounty && card.dataset.county.toLowerCase() !== activeCounty.toLowerCase()) show = false;
+
+      if (searchQuery && show) {
+        if (sectionMatchesSearch) {
+          show = true;
+        } else {
+          const matchName = card.dataset.name.includes(searchQuery);
+          const matchDesc = card.dataset.desc.includes(searchQuery);
+          show = matchName || matchDesc;
+        }
+      }
+
+      card.style.display = show ? '' : 'none';
+      if (show) {
+        visibleCount++;
+        sectionVisible++;
+      }
+    });
+
+    section.style.display = sectionVisible === 0 ? 'none' : '';
 
     const countEl = section.querySelector('.county-count');
     if (countEl) {
-      countEl.textContent = searchQuery ? `${visibleCards.length} of ${allCards.length}` : `${allCards.length} places`;
+      const total = cards.length;
+      countEl.textContent = (searchQuery && !sectionMatchesSearch) ? `${sectionVisible} of ${total}` : `${total} places`;
     }
   });
 
   provinceSections.forEach(section => {
-    const visibleCounties = Array.from(section.querySelectorAll('.county-section')).filter(c => c.style.display !== 'none');
-    section.style.display = visibleCounties.length === 0 ? 'none' : '';
+    const hasVisible = Array.from(section.querySelectorAll('.county-section')).some(c => c.style.display !== 'none');
+    section.style.display = hasVisible ? '' : 'none';
   });
 
   if (resultCountEl) resultCountEl.innerHTML = `<strong>${visibleCount}</strong> ${visibleCount === 1 ? 'place' : 'places'} found`;
 
   const hasFilters = activeProvince || activeCounty || searchQuery;
-  clearFiltersBtn.classList.toggle('visible', hasFilters);
-  emptyStateEl.classList.toggle('visible', visibleCount === 0);
-  mainEl.style.display = visibleCount === 0 ? 'none' : '';
+  if (clearFiltersBtn) clearFiltersBtn.classList.toggle('visible', !!hasFilters);
+  if (emptyStateEl) emptyStateEl.classList.toggle('visible', visibleCount === 0);
+  if (mainEl) mainEl.style.display = visibleCount === 0 ? 'none' : '';
 }
-
 
 // ─── SCROLL EFFECTS ───
 let lastScroll = 0;
 function onScroll() {
   const y = window.scrollY;
-  filterBar.classList.toggle('scrolled', y > 200);
-  backToTop.classList.toggle('visible', y > 600);
+  if (filterBar) filterBar.classList.toggle('scrolled', y > 200);
+  if (backToTop) backToTop.classList.toggle('visible', y > 600);
   lastScroll = y;
 }
 window.addEventListener('scroll', onScroll, { passive: true });
 onScroll();
 
-backToTop.addEventListener('click', () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
+if (backToTop) {
+  backToTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
 
 // ─── INITIAL RENDER ───
 applyFilters();

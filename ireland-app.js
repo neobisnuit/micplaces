@@ -173,41 +173,24 @@ function applyFilters() {
       show = matchName || matchDesc || matchCounty || matchProvince;
     }
 
-    card.hidden = !show;
-
-    const nameEl = card.querySelector('.attraction-name');
-    const descEl = card.querySelector('.attraction-desc');
-    const originalName = card.dataset.name;
-    const originalDesc = card.dataset.desc;
-
-    const attraction = findAttraction(card.dataset.province, card.dataset.county, nameEl.textContent);
-
-    if (searchQuery && show && attraction) {
-      nameEl.innerHTML = highlightText(attraction.name, searchQuery);
-      descEl.innerHTML = highlightText(attraction.desc, searchQuery);
-    } else if (attraction) {
-      nameEl.textContent = attraction.name;
-      descEl.textContent = attraction.desc;
-    }
-
+    card.style.display = show ? '' : 'none';
     if (show) visibleCount++;
   });
 
   countySections.forEach(section => {
-    const visibleCards = section.querySelectorAll('.attraction-card:not([hidden])');
-    section.hidden = visibleCards.length === 0;
+    const allCards = section.querySelectorAll('.attraction-card');
+    const visibleCards = Array.from(allCards).filter(c => c.style.display !== 'none');
+    section.style.display = visibleCards.length === 0 ? 'none' : '';
 
     const countEl = section.querySelector('.county-count');
     if (countEl) {
-      const total = section.querySelectorAll('.attraction-card').length;
-      const shown = visibleCards.length;
-      countEl.textContent = searchQuery ? `${shown} of ${total}` : `${total} places`;
+      countEl.textContent = searchQuery ? `${visibleCards.length} of ${allCards.length}` : `${allCards.length} places`;
     }
   });
 
   provinceSections.forEach(section => {
-    const visibleCounties = section.querySelectorAll('.county-section:not([hidden])');
-    section.hidden = visibleCounties.length === 0;
+    const visibleCounties = Array.from(section.querySelectorAll('.county-section')).filter(c => c.style.display !== 'none');
+    section.style.display = visibleCounties.length === 0 ? 'none' : '';
   });
 
   if (resultCountEl) resultCountEl.innerHTML = `<strong>${visibleCount}</strong> ${visibleCount === 1 ? 'place' : 'places'} found`;
@@ -218,19 +201,6 @@ function applyFilters() {
   mainEl.style.display = visibleCount === 0 ? 'none' : '';
 }
 
-function findAttraction(province, county, name) {
-  const p = DATA.find(d => d.province === province);
-  if (!p) return null;
-  const c = p.counties.find(co => co.name === county);
-  if (!c) return null;
-  return c.attractions.find(a => a.name === name) || null;
-}
-
-function highlightText(text, query) {
-  if (!query) return text;
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  return text.replace(regex, '<span class="highlight">$1</span>');
-}
 
 // ─── SCROLL EFFECTS ───
 let lastScroll = 0;

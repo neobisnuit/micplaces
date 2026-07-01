@@ -254,7 +254,14 @@ a.hero-pdf svg { flex-shrink: 0; color: #2fbd76 !important; }
   display: flex;
   gap: 6px;
   width: max-content;
-  will-change: transform;
+  animation: gotsScroll 60s linear infinite;
+}
+.gots-carousel:hover .gots-track {
+  animation-play-state: paused;
+}
+@keyframes gotsScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 .gots-track img {
   height: 200px;
@@ -371,7 +378,7 @@ a.gots-cta:hover {
   .gots-section { margin: 24px auto; padding: 0 16px; }
   .gots-track img { height: 160px; }
   .gots-content { padding: 24px 16px 28px; }
-  .gots-logo { height: 64px; }
+  .gots-logo { height: 84px; }
   .gots-desc { font-size: 14px; }
   .gots-promo-code span { font-size: 20px; }
 }
@@ -380,7 +387,7 @@ a.gots-cta:hover {
   .gots-track { gap: 4px; }
   .gots-track img { height: 130px; }
   .gots-content { padding: 20px 14px 24px; }
-  .gots-logo { height: 54px; }
+  .gots-logo { height: 84px; }
   .gots-promo-inner { padding: 12px 20px; }
 }
 

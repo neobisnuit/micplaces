@@ -255,51 +255,6 @@ if (backToTop) {
   });
 }
 
-// ─── GOTS CAROUSEL ───
-(function() {
-  const track = document.getElementById('gots-track');
-  if (!track) return;
-
-  const imgs = Array.from(track.querySelectorAll('img'));
-  if (imgs.length === 0) return;
-
-  imgs.forEach(img => {
-    const clone = img.cloneNode(true);
-    track.appendChild(clone);
-  });
-
-  let pos = 0;
-  let speed = 0.3;
-  let paused = false;
-  let raf;
-
-  function getResetPoint() {
-    let w = 0;
-    for (let i = 0; i < imgs.length; i++) {
-      w += imgs[i].offsetWidth + 6;
-    }
-    return w;
-  }
-
-  function animate() {
-    if (!paused) {
-      pos -= speed;
-      const resetAt = getResetPoint();
-      if (Math.abs(pos) >= resetAt) pos += resetAt;
-      track.style.transform = `translateX(${pos}px)`;
-    }
-    raf = requestAnimationFrame(animate);
-  }
-
-  const carousel = document.getElementById('gots-carousel');
-  if (carousel) {
-    carousel.addEventListener('mouseenter', () => { paused = true; });
-    carousel.addEventListener('mouseleave', () => { paused = false; });
-  }
-
-  animate();
-})();
-
 // ─── GOTS COPY CODE ───
 (function() {
   const copyBtn = document.getElementById('gots-copy');

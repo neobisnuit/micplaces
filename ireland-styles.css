@@ -378,7 +378,7 @@ a.gots-cta:hover {
   .gots-section { margin: 24px auto; padding: 0 16px; }
   .gots-track img { height: 160px; }
   .gots-content { padding: 24px 16px 28px; }
-  .gots-logo { height: 84px; }
+  .gots-logo { height: 200px; }
   .gots-desc { font-size: 14px; }
   .gots-promo-code span { font-size: 20px; }
 }
@@ -387,7 +387,7 @@ a.gots-cta:hover {
   .gots-track { gap: 4px; }
   .gots-track img { height: 130px; }
   .gots-content { padding: 20px 14px 24px; }
-  .gots-logo { height: 84px; }
+  .gots-logo { height: 200px; }
   .gots-promo-inner { padding: 12px 20px; }
 }
 
